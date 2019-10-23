@@ -1,5 +1,10 @@
 {
   "name": "@yusufkandemir/quasarian-in-action-helper",
+  "main": "src/index.js",
+  "bin": {
+    "@yusufkandemir/quasarian-in-action-helper": "bin/parse-issues",
+    "parse-issues": "bin/parse-issues"
+  },
   "dependencies": {
     "date-fns": "^2.6.0",
     "dotenv": "^8.2.0",
