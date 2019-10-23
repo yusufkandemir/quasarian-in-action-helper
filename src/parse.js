@@ -28,7 +28,9 @@ const parseIssues = async ({ githubFetcher, userBlacklist = [], repositoryPath, 
         const commitResponse = await githubFetcher(referencedEvent.commit_url)
         const rawCommit = await commitResponse.json()
 
-        fixInfo.title = rawCommit.commit.message
+        let title = rawCommit.commit.message
+        // Strip everything after the newline
+        fixInfo.title = title.substr(0, title.indexOf('\n'))
         fixInfo.authorName = referencedEvent.actor.login
         fixInfo.authorUrl = referencedEvent.actor.html_url
       } else {
