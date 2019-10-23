@@ -1,0 +1,9 @@
+{
+  "name": "@yusufkandemir/quasarian-in-action-helper",
+  "dependencies": {
+    "date-fns": "^2.6.0",
+    "dotenv": "^8.2.0",
+    "node-fetch": "^2.6.0",
+    "yargs": "^14.2.0"
+  }
+}

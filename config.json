@@ -1,0 +1,34 @@
+{
+  "repositories": [
+    "quasarframework/quasar",
+    "quasarframework/quasar-starter-kit",
+    "quasarframework/quasar-starter-kit-ui",
+    "quasarframework/quasar-starter-kit-umd",
+    "quasarframework/quasar-starter-kit-app-extension",
+    "quasarframework/vue-cli-plugin-quasar",
+    "quasarframework/app-extension-qscroller",
+    "quasarframework/quasar-ui-qcalendar"
+  ],
+  "userBlacklist": [
+    "dependabot-preview[bot]",
+    "rstoenescu",
+    "pdanpdan",
+    "hawkeye64",
+    "lucasfernog",
+    "nothingismagick",
+    "smolinari",
+    "webnoob",
+    "mesqueeb",
+    "panstromek",
+    "adamkpurdy",
+    "nklayman",
+    "codenamezjames",
+    "rossity",
+    "outofmemoryagain",
+    "TobyMosque",
+    "valasek",
+    "yusufkandemir",
+    "metalsadman",
+    "IlCallo"
+  ]
+}
