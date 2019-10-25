@@ -1,9 +1,12 @@
 require('dotenv').config()
 
 const yargs = require('yargs')
+const { subDays } = require('date-fns')
+
+const { parseIssues, parsePulls } = require('./parse')
+const { createGithubFetcher } = require('./createGithubFetcher')
 
 const config = require('../config.json')
-const getIssuesAndPulls = require('./getIssuesAndPulls')
 
 module.exports = async () => {
   const argv = yargs
@@ -17,13 +20,19 @@ module.exports = async () => {
     .alias('help', 'h')
     .argv
 
-  const result = await getIssuesAndPulls({
-    accessToken: process.env.ACCESS_TOKEN,
-    userBlacklist: config.userBlacklist,
-    repositories: config.repositories,
-    labels: ['bug'],
-    dayInterval: argv.days
-  })
+  const { repositories, userBlacklist } = config
+  const labels = ['bug']
+  const since = subDays(new Date(), argv.days).toISOString()
+  const githubFetcher = createGithubFetcher({ accessToken: process.env.ACCESS_TOKEN })
+
+  const result = await repositories.reduce(async (result, repositoryPath) => {
+    return Object.assign(await result, {
+      [repositoryPath]: {
+        issues: await parseIssues({ githubFetcher, userBlacklist, repositoryPath, since, labels }),
+        pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since })
+      }
+    })
+  }, Promise.resolve({}))
 
   console.log(JSON.stringify(result, null, 2))
 }
