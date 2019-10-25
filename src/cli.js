@@ -3,7 +3,7 @@ require('dotenv').config()
 const yargs = require('yargs')
 const { subDays } = require('date-fns')
 
-const { parseIssues, parsePulls } = require('./parse')
+const { parseIssues, parsePulls, parseReleases } = require('./parse')
 const { createGithubFetcher } = require('./createGithubFetcher')
 
 const config = require('../config.json')
@@ -29,7 +29,8 @@ module.exports = async () => {
     return Object.assign(await result, {
       [repositoryPath]: {
         issues: await parseIssues({ githubFetcher, userBlacklist, repositoryPath, since, labels }),
-        pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since })
+        pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since }),
+        releases: await parseReleases({ githubFetcher, repositoryPath, since })
       }
     })
   }, Promise.resolve({}))

@@ -85,7 +85,35 @@ const parsePulls = async ({ githubFetcher, userBlacklist = [], repositoryPath, s
   return pulls
 }
 
+/**
+ * Returns the merged pull requests
+ * 
+ * @param {Object} config
+ * @param {Function} config.githubFetcher Used in API calls, can be created using 'createGithubFetcher'
+ * @param {string} config.repositoryPath Github repository path in form of 'author/repository'
+ * @param {string} config.since Releases older than 'since' will be filtered out (in form of ISO 8061 date string)
+ */
+const parseReleases = async ({ githubFetcher, repositoryPath, since }) => {
+  const releasesResponse = await githubFetcher(`/repos/${repositoryPath}/releases`)
+  const rawReleases = await releasesResponse.json()
+
+  const releases = rawReleases
+    .filter(release =>
+      release.published_at !== null &&
+      compareAsc(parseISO(release.published_at), parseISO(since)) > 0
+    )
+    .map(release => {
+      return {
+        name: release.name,
+        url: release.html_url
+      }
+    })
+
+  return releases
+}
+
 module.exports = {
   parseIssues,
-  parsePulls
+  parsePulls,
+  parseReleases
 }
