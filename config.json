@@ -34,7 +34,6 @@
     "quasarframework/app-extension-wizard",
     "quasarframework/app-extension-obyte",
     "quasarframework/app-extension-feathersjs",
-    "quasarframework/quasar-codesandbox",
     "quasarframework/app-extension-firebase"
   ],
   "userBlacklist": [
