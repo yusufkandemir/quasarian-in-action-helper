@@ -38,6 +38,11 @@ module.exports = async () => {
   
     console.log(JSON.stringify(result, null, 2))
   } catch (error) {
+    console.error('Full details:')
+    console.error(error)
+
+    console.error()
+    console.error('Short explanation:')
     console.error(error.message)
     if (error.response) {
       console.error(await error.response.json())
