@@ -36,7 +36,7 @@ const parseIssues = async ({ githubFetcher, userBlacklist = [], repositoryPath, 
         }
 
         fixInfo.title = title
-        fixInfo.authorName = referencedEvent.actor.login
+        fixInfo.authorName = await getUserName({ githubFetcher, login: referencedEvent.actor.login })
         fixInfo.authorUrl = referencedEvent.actor.html_url
       } else {
         // If closed directly rather than by a fix, return null, then filter it later
@@ -46,7 +46,7 @@ const parseIssues = async ({ githubFetcher, userBlacklist = [], repositoryPath, 
       return {
         title: issue.title,
         url: issue.html_url,
-        reporterName: issue.user.login,
+        reporterName: await getUserName({ githubFetcher, login: issue.user.login }),
         reporterUrl: issue.user.html_url,
         fixTitle: fixInfo.title,
         fixAuthorName: fixInfo.authorName,
@@ -78,16 +78,16 @@ const parsePulls = async ({ githubFetcher, userBlacklist = [], repositoryPath, s
       pull.merged_at !== null &&
       compareAsc(parseISO(pull.merged_at), parseISO(since)) > 0
     )
-    .map(pull => {
+    .map(async pull => {
       return {
         title: pull.title,
         url: pull.html_url,
-        authorName: pull.user.login,
+        authorName: await getUserName({ githubFetcher, login: pull.user.login }),
         authorUrl: pull.user.html_url
       }
     })
 
-  return pulls
+  return Promise.all(pulls)
 }
 
 /**
@@ -115,6 +115,13 @@ const parseReleases = async ({ githubFetcher, repositoryPath, since }) => {
     })
 
   return releases
+}
+
+const getUserName = async ({ githubFetcher, login }) => {
+  const userResponse = await githubFetcher(`/users/${login}`)
+  const rawUser = await userResponse.json()
+
+  return rawUser.name || rawUser.login
 }
 
 module.exports = {
