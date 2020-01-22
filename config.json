@@ -15,7 +15,7 @@
     "quasarframework/quasar-testing",
     "quasarframework/app-extension-qpdfviewer",
     "quasarframework/app-extension-icon-genie",
-    "quasarframework/app-extension-qribbon",
+    "quasarframework/quasar-ui-qribbon",
     "quasarframework/app-extension-qenv",
     "quasarframework/app-extension-qmediaplayer",
     "quasarframework/app-extension-qwindow",
