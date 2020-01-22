@@ -34,7 +34,9 @@
     "quasarframework/app-extension-wizard",
     "quasarframework/app-extension-obyte",
     "quasarframework/app-extension-feathersjs",
-    "quasarframework/app-extension-firebase"
+    "quasarframework/app-extension-firebase",
+    "quasarframework/quasar-codesandbox",
+    "quasarframework/app-extension-dotenv"
   ],
   "userBlacklist": [
     "dependabot-preview[bot]",
