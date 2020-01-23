@@ -117,6 +117,36 @@ const parseReleases = async ({ githubFetcher, repositoryPath, since }) => {
   return releases
 }
 
+/**
+ * Returns the commit counts per user
+ * 
+ * @param {Object} config
+ * @param {Function} config.githubFetcher Used in API calls, can be created using 'createGithubFetcher'
+ * @param {string[]} config.userBlacklist List of users to be blacklisted
+ * @param {string} config.repositoryPath Github repository path in form of 'author/repository'
+ * @param {string} config.since Releases older than 'since' will be filtered out (in form of ISO 8061 date string)
+ */
+const parseCommitCounts = async ({ githubFetcher, userBlacklist = [], repositoryPath, since }) => {
+  const params = new URLSearchParams({ since })
+
+  const commitsResponse = await githubFetcher(`/repos/${repositoryPath}/commits?${params.toString()}`)
+  const rawCommits = await commitsResponse.json()
+
+  const commitCounts = rawCommits
+    .map(rawCommit => userBlacklist.includes(rawCommit.author.login) ? rawCommit.author.login : '[others]')
+    .reduce((result, author) => {
+      if (result[author] === undefined) {
+        result[author] = { author, count: 0 }
+      }
+
+      result[author].count++
+
+      return result
+    }, {})
+
+  return Object.values(commitCounts)
+}
+
 const getUserName = async ({ githubFetcher, login }) => {
   const userResponse = await githubFetcher(`/users/${login}`)
   const rawUser = await userResponse.json()
@@ -127,5 +157,6 @@ const getUserName = async ({ githubFetcher, login }) => {
 module.exports = {
   parseIssues,
   parsePulls,
-  parseReleases
+  parseReleases,
+  parseCommitCounts
 }

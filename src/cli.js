@@ -3,7 +3,7 @@ require('dotenv').config()
 const yargs = require('yargs')
 const { subDays } = require('date-fns')
 
-const { parseIssues, parsePulls, parseReleases } = require('./parse')
+const { parseIssues, parsePulls, parseReleases, parseCommitCounts } = require('./parse')
 const { createGithubFetcher } = require('./createGithubFetcher')
 
 const config = require('../config.json')
@@ -31,11 +31,12 @@ module.exports = async () => {
         [repositoryPath]: {
           issues: await parseIssues({ githubFetcher, userBlacklist, repositoryPath, since, labels }),
           pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since }),
-          releases: await parseReleases({ githubFetcher, repositoryPath, since })
+          releases: await parseReleases({ githubFetcher, repositoryPath, since }),
+          commitCounts: await parseCommitCounts({ githubFetcher, userBlacklist, repositoryPath, since })
         }
       })
     }, Promise.resolve({}))
-  
+
     console.log(JSON.stringify(result, null, 2))
   } catch (error) {
     console.error('Full details:')
