@@ -2,7 +2,7 @@
   "repositories": [
     "quasarframework/quasar",
     "quasarframework/quasar-starter-kit-ui",
-    "quasarframework/app-extension-qscroller",
+    "quasarframework/quasar-ui-qscroller",
     "quasarframework/quasar-awesome",
     "quasarframework/vue-cli-plugin-quasar",
     "quasarframework/app-extension-typescript",
@@ -11,17 +11,17 @@
     "quasarframework/firebase-sample-apps",
     "quasarframework/eslint-plugin-quasar",
     "quasarframework/quasar-starter-kit",
-    "quasarframework/app-extension-qmarkdown",
+    "quasarframework/quasar-ui-qmarkdown",
     "quasarframework/quasar-testing",
     "quasarframework/app-extension-qpdfviewer",
     "quasarframework/app-extension-icon-genie",
-    "quasarframework/app-extension-qribbon",
+    "quasarframework/quasar-ui-qribbon",
     "quasarframework/app-extension-qenv",
-    "quasarframework/app-extension-qmediaplayer",
+    "quasarframework/quasar-ui-qmediaplayer",
     "quasarframework/app-extension-qwindow",
     "quasarframework/app-extension-qplaceholder",
-    "quasarframework/app-extension-qoverlay",
-    "quasarframework/app-extension-qflashcard",
+    "quasarframework/quasar-ui-qoverlay",
+    "quasarframework/quasar-ui-qflashcard",
     "quasarframework/app-extension-qactivity",
     "quasarframework/quasar-starter-kit-app-extension",
     "quasarframework/app-extension-examples",
@@ -34,7 +34,9 @@
     "quasarframework/app-extension-wizard",
     "quasarframework/app-extension-obyte",
     "quasarframework/app-extension-feathersjs",
-    "quasarframework/app-extension-firebase"
+    "quasarframework/app-extension-firebase",
+    "quasarframework/quasar-codesandbox",
+    "quasarframework/app-extension-dotenv"
   ],
   "userBlacklist": [
     "dependabot-preview[bot]",
@@ -44,6 +46,9 @@
     "lucasfernog",
     "smolinari",
     "webnoob",
-    "TobyMosque"
+    "tobymosque",
+    "ilcallo",
+    "metalsadman",
+    "valasek"
   ]
 }
