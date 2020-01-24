@@ -3,7 +3,7 @@ require('dotenv').config()
 const yargs = require('yargs')
 const { subDays } = require('date-fns')
 
-const { parseIssues, parsePulls, parseReleases } = require('./parse')
+const { parseIssues, parsePulls, parseReleases, parseCommitCounts } = require('./parse')
 const { createGithubFetcher } = require('./createGithubFetcher')
 
 const config = require('../config.json')
@@ -20,7 +20,7 @@ module.exports = async () => {
     .alias('help', 'h')
     .argv
 
-  const { repositories, userBlacklist } = config
+  const { repositories, userBlacklist, commitCountBlacklist } = config
   const labels = ['bug']
   const since = subDays(new Date(), argv.days).toISOString()
   const githubFetcher = createGithubFetcher({ accessToken: process.env.ACCESS_TOKEN })
@@ -31,11 +31,12 @@ module.exports = async () => {
         [repositoryPath]: {
           issues: await parseIssues({ githubFetcher, userBlacklist, repositoryPath, since, labels }),
           pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since }),
-          releases: await parseReleases({ githubFetcher, repositoryPath, since })
+          releases: await parseReleases({ githubFetcher, repositoryPath, since }),
+          commitCounts: await parseCommitCounts({ githubFetcher, importantUsers: userBlacklist, userBlacklist: commitCountBlacklist, repositoryPath, since })
         }
       })
     }, Promise.resolve({}))
-  
+
     console.log(JSON.stringify(result, null, 2))
   } catch (error) {
     console.error('Full details:')

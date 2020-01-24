@@ -117,6 +117,49 @@ const parseReleases = async ({ githubFetcher, repositoryPath, since }) => {
   return releases
 }
 
+/**
+ * Returns the commit counts per user.
+ * Users specified in 'config.importantAuthors' will have separate entries,
+ * while the other ones will be counted all together as one entry named as '[others]'
+ * 
+ * @param {Object} config
+ * @param {Function} config.githubFetcher Used in API calls, can be created using 'createGithubFetcher'
+ * @param {string[]} config.userBlacklist List of users to be blacklisted completely from counting
+ * @param {string[]} config.importantUsers List of important users to be counted outside of other users
+ * @param {string} config.repositoryPath Github repository path in form of 'author/repository'
+ * @param {string} config.since Releases older than 'since' will be filtered out (in form of ISO 8061 date string)
+ */
+const parseCommitCounts = async ({ githubFetcher, userBlacklist = [], importantUsers = [], repositoryPath, since }) => {
+  const params = new URLSearchParams({ since })
+
+  const commitsResponse = await githubFetcher(`/repos/${repositoryPath}/commits?${params.toString()}`)
+  const rawCommits = await commitsResponse.json()
+
+  const commitCounts = rawCommits
+    .filter(rawCommit => !userBlacklist.includes(rawCommit.author.login))
+    .map(rawCommit => importantUsers.includes(rawCommit.author.login) ? rawCommit.author.login : '[others]')
+    .reduce((result, author) => {
+      if (result[author] === undefined) {
+        result[author] = { author, count: 0 }
+      }
+
+      result[author].count++
+
+      return result
+    }, {})
+
+  const { '[others]': othersResults, ...authorsResult } = commitCounts
+  const sortedAuthorsResult = Object.values(authorsResult).sort((x, y) => y.count - x.count)
+
+  const finalResult = [...sortedAuthorsResult]
+
+  if (othersResults !== undefined) {
+    finalResult.unshift(othersResults)
+  }
+
+  return finalResult
+}
+
 const getUserName = async ({ githubFetcher, login }) => {
   const userResponse = await githubFetcher(`/users/${login}`)
   const rawUser = await userResponse.json()
@@ -127,5 +170,6 @@ const getUserName = async ({ githubFetcher, login }) => {
 module.exports = {
   parseIssues,
   parsePulls,
-  parseReleases
+  parseReleases,
+  parseCommitCounts
 }
