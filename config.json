@@ -45,5 +45,8 @@
     "smolinari",
     "webnoob",
     "TobyMosque"
+  ],
+  "commitCountBlacklist": [
+    "dependabot-preview[bot]"
   ]
 }

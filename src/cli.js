@@ -20,7 +20,7 @@ module.exports = async () => {
     .alias('help', 'h')
     .argv
 
-  const { repositories, userBlacklist } = config
+  const { repositories, userBlacklist, commitCountBlacklist } = config
   const labels = ['bug']
   const since = subDays(new Date(), argv.days).toISOString()
   const githubFetcher = createGithubFetcher({ accessToken: process.env.ACCESS_TOKEN })
@@ -32,7 +32,7 @@ module.exports = async () => {
           issues: await parseIssues({ githubFetcher, userBlacklist, repositoryPath, since, labels }),
           pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since }),
           releases: await parseReleases({ githubFetcher, repositoryPath, since }),
-          commitCounts: await parseCommitCounts({ githubFetcher, userBlacklist, repositoryPath, since })
+          commitCounts: await parseCommitCounts({ githubFetcher, importantUsers: userBlacklist, userBlacklist: commitCountBlacklist, repositoryPath, since })
         }
       })
     }, Promise.resolve({}))
