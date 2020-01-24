@@ -146,15 +146,18 @@ const parseCommitCounts = async ({ githubFetcher, userBlacklist = [], importantU
       result[author].count++
 
       return result
-    }, { '[others]': { author: '[others]', count: 0 } })
+    }, {})
 
   const { '[others]': othersResults, ...authorsResult } = commitCounts
   const sortedAuthorsResult = Object.values(authorsResult).sort((x, y) => y.count - x.count)
 
-  return [
-    othersResults,
-    ...sortedAuthorsResult
-  ]
+  const finalResult = [...sortedAuthorsResult]
+
+  if (othersResults !== undefined) {
+    finalResult.unshift(othersResults)
+  }
+
+  return finalResult
 }
 
 const getUserName = async ({ githubFetcher, login }) => {
