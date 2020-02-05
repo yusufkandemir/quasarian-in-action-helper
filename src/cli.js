@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const yargs = require('yargs')
 const { subDays } = require('date-fns')
+const ora = require('ora')
 
 const { parseIssues, parsePulls, parseReleases, parseCommitCounts } = require('./parse')
 const { createGithubFetcher } = require('./createGithubFetcher')
@@ -25,23 +26,31 @@ module.exports = async () => {
   const since = subDays(new Date(), argv.days).toISOString()
   const githubFetcher = createGithubFetcher({ accessToken: process.env.ACCESS_TOKEN })
 
+  const spinner = ora()
+
   try {
-    const result = await repositories.reduce(async (result, repositoryPath) => {
-      return Object.assign(await result, {
-        [repositoryPath]: {
     const results = {}
 
-    for (const repositoryPath of repositories) {
+    for (const [index, repositoryPath] of repositories.entries()) {
+      const progress = `${index + 1}/${repositories.length}`
+      spinner.start(`(${progress}) Processing the repository: ${repositoryPath}`)
+
       results[repositoryPath] = {
         issues: await parseIssues({ githubFetcher, userBlacklist, repositoryPath, since, labels }),
         pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since }),
         releases: await parseReleases({ githubFetcher, repositoryPath, since }),
         commitCounts: await parseCommitCounts({ githubFetcher, importantUsers: userBlacklist, userBlacklist: commitCountBlacklist, repositoryPath, since })
       }
+
+      spinner.succeed(`(${progress}) Succesfully processed the repository: ${repositoryPath}`)
     }
+
+    spinner.stop()
 
     console.log(JSON.stringify(results, null, 2))
   } catch (error) {
+    spinner.fail('An error occured while processing the repositories')
+
     console.error('Full details:')
     console.error(error)
 
