@@ -136,8 +136,8 @@ const parseCommitCounts = async ({ githubFetcher, userBlacklist = [], importantU
   const rawCommits = await commitsResponse.json()
 
   const commitCounts = rawCommits
-    .filter(rawCommit => !userBlacklist.includes(rawCommit.author.login))
-    .map(rawCommit => importantUsers.includes(rawCommit.author.login) ? rawCommit.author.login : '[others]')
+    .filter(rawCommit => rawCommit.author === null || !userBlacklist.includes(rawCommit.author.login))
+    .map(rawCommit => (rawCommit.author !== null && importantUsers.includes(rawCommit.author.login)) ? rawCommit.author.login : '[others]')
     .reduce((result, author) => {
       if (result[author] === undefined) {
         result[author] = { author, count: 0 }
