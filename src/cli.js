@@ -29,15 +29,18 @@ module.exports = async () => {
     const result = await repositories.reduce(async (result, repositoryPath) => {
       return Object.assign(await result, {
         [repositoryPath]: {
-          issues: await parseIssues({ githubFetcher, userBlacklist, repositoryPath, since, labels }),
-          pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since }),
-          releases: await parseReleases({ githubFetcher, repositoryPath, since }),
-          commitCounts: await parseCommitCounts({ githubFetcher, importantUsers: userBlacklist, userBlacklist: commitCountBlacklist, repositoryPath, since })
-        }
-      })
-    }, Promise.resolve({}))
+    const results = {}
 
-    console.log(JSON.stringify(result, null, 2))
+    for (const repositoryPath of repositories) {
+      results[repositoryPath] = {
+        issues: await parseIssues({ githubFetcher, userBlacklist, repositoryPath, since, labels }),
+        pulls: await parsePulls({ githubFetcher, userBlacklist, repositoryPath, since }),
+        releases: await parseReleases({ githubFetcher, repositoryPath, since }),
+        commitCounts: await parseCommitCounts({ githubFetcher, importantUsers: userBlacklist, userBlacklist: commitCountBlacklist, repositoryPath, since })
+      }
+    }
+
+    console.log(JSON.stringify(results, null, 2))
   } catch (error) {
     console.error('Full details:')
     console.error(error)
