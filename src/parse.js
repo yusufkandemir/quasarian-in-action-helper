@@ -1,4 +1,5 @@
 const { parseISO, compareAsc } = require('date-fns')
+const fs = require('fs')
 
 /**
  * Returns the closed issues that are referenced in a commit
@@ -167,9 +168,74 @@ const getUserName = async ({ githubFetcher, login }) => {
   return rawUser.name || rawUser.login
 }
 
+/**
+ * Saves repo activities in json and parsed in markdown format.
+ * 
+ * @param {json} repoActivity input JSON object holding fetched repo activities
+ * @param {string} outFileRaw output file name containing fetched repo activities in JSON format
+ * @param {string} outFileMD output file name containing fetched repo activities in parsed markdown format
+ * @param {string} templateMD file name having markdown template
+ * 
+ */
+const saveOutputFiles = (repoActivity, outFileRaw, outFileMD, templateMD) => {
+  saveFile(outFileRaw, JSON.stringify(repoActivity, null, 2))
+
+  let commitActivity = ''
+  let lastRepoName = ''
+  let parsedMD = ''
+  for (repo in repoActivity) {
+    if ((lastRepoName === '' || repo != lastRepoName)) {
+      lastRepoName = repo
+      if (repoActivity[repo].issues.length > 0 || repoActivity[repo].pulls.length > 0) { // repoActivity[repo].releases.length > 0)
+        parsedMD = parsedMD + `\n#### ${repo}` // print repo name only if there is any activity
+      }
+      if (repoActivity[repo].commitCounts.length > 0) {
+        commitActivity = commitActivity + `\n#### ${repo}` // print repo name only if there is any activity
+      }
+    }
+    if (repoActivity[repo].issues.length > 0) {
+      repoActivity[repo].issues.forEach(el => {
+        parsedMD = parsedMD + `\n**[${el.reporterName}](${el.reporterUrl})** reported the issue [${el.title}](${el.url}) which was fixed by a ${el.fixTitle}`
+      })
+    }
+    if (repoActivity[repo].pulls.length > 0) {
+      repoActivity[repo].pulls.forEach(el => {
+        parsedMD = parsedMD + `\n**[${el.authorName}](${el.authorUrl})** submitted a PR [${el.title}](${el.url})`
+      })
+
+    }
+    if (repoActivity[repo].commitCounts.length > 0) {
+      repoActivity[repo].commitCounts.forEach(el => {
+        let author = el.author
+        if (author === '[others]') {
+          commitActivity = commitActivity + `\n* Contributors - ${el.count} (commits authored by Quasar community members)`
+        } else {
+          commitActivity = commitActivity + `\n* ${author} - ${el.count}`
+        }
+      })
+    }
+    if (repoActivity[repo].releases.length > 0) {
+      if (repoActivity[repo].releases.length > 0) {
+        repoActivity[repo].releases.forEach(el => {
+          parsedMD = parsedMD + `\n[${el.name}](${el.url})`
+        })
+      }
+    }
+  }
+  
+  saveFile(outFileMD, fs.readFileSync(templateMD) + parsedMD + '\n### Repository Activity' + commitActivity)
+}
+
+function saveFile (fileName, content) {
+  fs.writeFile(fileName, content, (err) => {
+    console.log(`The file ${fileName} has been saved!`)
+  })
+}
+
 module.exports = {
   parseIssues,
   parsePulls,
   parseReleases,
-  parseCommitCounts
+  parseCommitCounts,
+  saveOutputFiles
 }
