@@ -4,10 +4,13 @@ const yargs = require('yargs')
 const { subDays } = require('date-fns')
 const ora = require('ora')
 
-const { parseIssues, parsePulls, parseReleases, parseCommitCounts } = require('./parse')
+const { saveOutputFiles, parseIssues, parsePulls, parseReleases, parseCommitCounts } = require('./parse')
 const { createGithubFetcher } = require('./createGithubFetcher')
 
 const config = require('../config.json')
+const repoActititiesRaw = 'quasarians-weekly.json'
+const repoActititiesMD = 'quasarians-weekly.md'
+const templateMD = 'template.md'
 
 module.exports = async () => {
   const argv = yargs
@@ -47,7 +50,8 @@ module.exports = async () => {
 
     spinner.stop()
 
-    console.log(JSON.stringify(results, null, 2))
+    saveOutputFiles(results, repoActititiesRaw, repoActititiesMD, templateMD)
+
   } catch (error) {
     spinner.fail('An error occured while processing the repositories')
 
